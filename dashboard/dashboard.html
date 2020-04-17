@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Projeto 4</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+  <!-- Bootstrap core CSS -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <!-- Material Design Bootstrap -->
+  <link href="css/mdb.min.css" rel="stylesheet">
+  <!-- Your custom styles (optional) -->
+  <link href="css/style.min.css" rel="stylesheet">
+  <style>
+    .map-container{
+      overflow:hidden;
+      padding-bottom:56.25%;
+      position:relative;
+      height:0;
+    }
+    .map-container iframe{
+      left:0;
+      top:0;
+      height:100%;
+      width:100%;
+      position:absolute;
+    }
+  </style>
+</head>
+
+<body class="grey lighten-3">
+  <!--Main Navigation-->
+  <header>
+    <!-- Navbar -->
+    <nav class="navbar fixed-top navbar-expand-lg navbar-light white scrolling-navbar">
+      <div class="container-fluid">
+        <!-- Brand -->
+        <a class="navbar-brand waves-effect" href="http://localhost/proj4/alimentos/dashboard.html" target="_self">
+          <strong class="blue-text">Projeto 4</strong>
+        </a>
+        <!-- Collapse -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      </div>
+    </nav>
+    <!-- Navbar -->
+
+    <!-- Sidebar -->
+    <div class="sidebar-fixed position-fixed">
+      <a class="logo-wrapper waves-effect">
+      </a>
+      <div class="list-group list-group-flush">
+        <a href="#" class="list-group-item active waves-effect">
+          <i class="fas fa-chart-pie mr-3"></i>Dashboard</a>
+      </div>
+
+    </div>
+    <!-- Sidebar -->
+
+  </header>
+  <!--Main Navigation-->
+
+  <!--Main layout-->
+  <main class="pt-5 mx-lg-5">
+    <div class="container-fluid mt-5">
+      <!-- Heading -->
+      <div class="card mb-4 wow fadeIn">
+        <!--Card content-->
+        <div class="card-body d-sm-flex justify-content-between">
+          <h4 class="mb-2 mb-sm-0 pt-1">
+          </h4>
+
+          <form class="d-flex justify-content-center">
+            <!-- Default input -->
+            <select id="monthId">
+                <option value="0">January</option>
+                <option value="1">February</option>
+                <option value="2">March</option>
+                <option value="3">April</option>
+                <option value="4">May</option>
+                <option value="5">June</option>
+                <option value="6">July</option>
+                <option value="7">August</option>
+                <option value="8">September</option>
+                <option value="9">October</option>
+                <option value="10">November</option>
+                <option value="11">December</option>
+              </select>
+            <button type="button" class="btn btn-primary btn-sm my-0 p" onclick="monthFilter()">
+              <i class="fas fa-search"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+      <!-- Heading -->
+
+      <!--Grid row-->
+      <div class="row wow fadeIn">
+        <!--Grid column-->
+        <div class="col-md-9 mb-4">
+          <!--Card-->
+          <div class="card">            
+            <!--Card content-->
+            <div class="card-body">
+              <canvas id="myChart"></canvas>
+            </div>
+          </div>
+          <!--/.Card-->
+        </div>
+        <!--Grid column-->
+
+        <!--Grid column-->
+        <div class="col-md-3 mb-4">
+          <!--Card-->
+          <div class="card mb-4">
+            <!-- Card header -->
+            <div class="card-header text-center">
+                Situação Geral
+            </div>
+            <!--Card content-->
+            <div class="card-body">
+              <canvas id="pieChart"></canvas>
+            </div>
+          </div>
+          <!--/.Card-->
+        </div>
+        <!--Grid column-->
+      </div>
+      <!--Grid row-->
+    </div>
+  </main>
+  <!--Main layout-->
+
+  <!-- SCRIPTS -->
+  <!-- JQuery -->
+  <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+  <!-- Bootstrap tooltips -->
+  <script type="text/javascript" src="js/popper.min.js"></script>
+  <!-- Bootstrap core JavaScript -->
+  <script type="text/javascript" src="js/bootstrap.min.js"></script>
+  <!-- MDB core JavaScript -->
+  <script type="text/javascript" src="js/mdb.min.js"></script>
+  <!-- Initializations -->
+  <script type="text/javascript">
+    // Animations initialization
+    new WOW().init();
+
+  </script>
+ 
+  <!-- Charts -->
+  <script>
+    var desperdicios = [];
+    var currentDesp = 0;
+    var countRed = 0;
+    var countOrange = 0;
+    var countYellow = 0;
+    var countGreen = 0;
+
+    var datahora = [];
+    var currentDH = 0;
+
+    var countJanuary = 0;
+    var countFebruary = 0;
+    var countMarch = 0;
+    var countApril = 0;
+    var countMay = 0;
+    var countJune = 0;
+    var countJuly = 0;
+    var countAugust = 0;
+    var countSeptember = 0;
+    var countOctober = 0;
+    var countNovember = 0;
+    var countDecember = 0;
+
+    window.onload = function(){
+      var url = "http://localhost/proj4/alimentos/webserviceGetAll.php"
+      fetch(url)
+      .then(function(response){
+        return response.json();
+      })
+      .then(function(data){
+        allData = data;
+        console.log(data.desp.length);
+        for(i=0; i<data.desp.length; i++){
+          switch(data.desp[i].desperdicio){
+            case "0-20":
+              desperdicios[currentDesp] == "Verde"
+              currentDesp++;
+              countGreen++;
+              break;
+            case "21-40":
+              desperdicios[currentDesp] == "Verde"
+              currentDesp++;
+              countGreen++;
+              break;
+            case "41-60":
+              desperdicios[currentDesp] == "Amarelo"
+              currentDesp++;
+              countYellow++;
+              break;
+            case "61-80":
+              desperdicios[currentDesp] == "Laranja"
+              currentDesp++;
+              countOrange++;
+              break;
+            case "81-100":
+              desperdicios[currentDesp] == "Vermelho"
+              currentDesp++;
+              countRed++;
+              break;
+          }
+        }
+
+        for(j=0; j<data.desp.length; j++){
+          var d = new Date(data.desp[j].datahora);
+          datahora[currentDH] = d;
+          currentDH++;
+        }
+        
+        //LINE CHART
+        var ctxL = document.getElementById("myChart").getContext('2d');
+        for(m=0; m<datahora.length; m++){
+          //month = datahora[m].getMonth();
+          switch(datahora[m].getMonth()){
+            case 0:
+              countJanuary++;
+              break;
+            case 1:
+              countFebruary++;
+              break;
+            case 2:
+              countMarch++;
+              break;
+            case 3:
+              countApril++;
+              break;
+            case 4:
+              countMay++;
+              break;
+            case 5:
+              countJune++;
+              break;
+            case 6:
+              countJuly++;
+              break;
+            case 7:
+              countAugust++;
+              break;
+            case 8:
+              countSeptember++;
+              break;
+            case 9:
+              countOctober++;
+              break;
+            case 10:
+              countNovember++;
+              break;
+            case 11:
+              countDecember++;
+              break;
+          }
+        }
+        var myLineChart = new Chart(ctxL, {
+          type: 'line',
+          data: {
+            labels: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+            datasets: [{
+                label: "Quantity of meals - 2019",
+                backgroundColor: [
+                  'rgba(105, 0, 132, .2)',
+                ],
+                borderColor: [
+                  'rgba(200, 99, 132, .7)',
+                ],
+                borderWidth: 2,
+                data: [countJanuary, countFebruary, countMarch, countApril, countMay, countJune, countJuly, countAugust, countSeptember, countOctober, countNovember, countDecember]
+              }
+            ]
+          },
+          options: {
+            responsive: true
+          }
+        });
+
+        //PIE CHART
+        var ctxP = document.getElementById("pieChart").getContext('2d');
+        var myPieChart = new Chart(ctxP, {
+          type: 'pie',
+          data: {
+            labels: ["Crítico", "Negativo", "Neutro", "Favorável"],
+            datasets: [{
+              data: [countRed, countOrange, countYellow, countGreen],
+              backgroundColor: ["#bd3b3b", "#ffaa00", "#ffff55", "#48a90a"],
+              hoverBackgroundColor: ["#c34e4e", "#ffb219", "#ffff88", "#5ab122"]
+            }]
+          },
+          options: {
+            responsive: false,
+            legend: {
+              display: true,
+              position: 'bottom'
+            }
+          }
+        });
+      })
+      .catch(function(error){
+        console.log(error.message);
+      })
+    }
+
+    function monthFilter(){
+      var e = document.getElementById("monthId");
+      var strUser = e.options[e.selectedIndex].value;
+      var nurl = "http://localhost/proj4/alimentos/dashboardMonth.html?id="+strUser;
+      window.location.href = nurl;
+    }
+  </script>
+</body>
+
+</html>
